@@ -1,6 +1,5 @@
-use crate::fs_tree::get_files;
+use crate::types::FileEntry;
 use owo_colors::OwoColorize;
-use std::path::Path;
 use tabled::{
     Table,
     settings::{
@@ -9,9 +8,7 @@ use tabled::{
     },
 };
 
-pub(crate) fn print_table(path: &Path) {
-    let files = get_files(path);
-
+pub(crate) fn print_table(files: Vec<FileEntry>) {
     let mut table = Table::new(files);
     table.with(Style::rounded());
 

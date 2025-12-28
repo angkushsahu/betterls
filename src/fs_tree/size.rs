@@ -1,4 +1,4 @@
-pub(crate) fn readable_size(bytes: u128) -> String {
+pub(super) fn readable_size(bytes: u128) -> String {
     const UNITS: [&str; 7] = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
 
     let mut size = bytes as f64;

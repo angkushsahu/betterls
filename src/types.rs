@@ -1,11 +1,23 @@
 use serde::Serialize;
-use strum_macros::Display;
 use tabled::Tabled;
 
-#[derive(Display, Serialize)]
+#[derive(Serialize)]
 pub(crate) enum EntryType {
     File,
     Directory,
+    SymLink,
+}
+
+impl std::fmt::Display for EntryType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let format_type = match self {
+            Self::File => "File",
+            Self::Directory => "Directory",
+            Self::SymLink => "SymLink",
+        };
+
+        write!(f, "{}", format_type)
+    }
 }
 
 #[derive(Tabled, Serialize)]
