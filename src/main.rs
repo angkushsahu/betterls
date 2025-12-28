@@ -43,10 +43,11 @@ struct Cli {
 
 fn main() {
     let cli = Cli::parse();
-    let path = cli.path.unwrap_or(PathBuf::from("."));
+    let path = cli.path.unwrap_or(PathBuf::from(".")); // check path, if not present, set it to current directory
 
     if let Ok(does_exist) = fs::exists(&path) {
         if does_exist {
+            // check if the --json argument is passed
             if cli.json {
                 let files = get_files(&path);
                 let files_json =
@@ -56,10 +57,12 @@ fn main() {
                 print_table(&path);
             }
         } else {
-            println!("{}", "Path does not exist".bright_red());
+            // In case path does not exist
+            print_error("Path does not exist");
         }
     } else {
-        println!("{}", "Unable to read or find directory".bright_red());
+        // In case fs::exists throws error
+        print_error("Unable to read or find directory");
     }
 }
 
@@ -76,26 +79,32 @@ fn get_files(path: &Path) -> Vec<FileEntry> {
 }
 
 fn map_data(file: fs::DirEntry, data: &mut Vec<FileEntry>) {
-    let name = file
-        .file_name()
-        .into_string()
-        .unwrap_or(String::from("Unknown name"));
-
     if let Ok(metadata) = fs::metadata(file.path()) {
+        let name = file
+            .file_name()
+            .into_string()
+            .unwrap_or(String::from("Unknown name"));
+
+        let entry_type = if metadata.is_dir() {
+            EntryType::Directory
+        } else {
+            EntryType::File
+        };
+
+        let size = metadata.len() as u128;
+
+        let modified = if let Ok(modified) = metadata.modified() {
+            let date: DateTime<Utc> = modified.into();
+            format!("{}", date.format("%a %b %e %Y, %H:%M"))
+        } else {
+            String::new()
+        };
+
         let file_entry = FileEntry {
             name,
-            entry_type: if metadata.is_dir() {
-                EntryType::Directory
-            } else {
-                EntryType::File
-            },
-            size: metadata.len() as u128,
-            modified: if let Ok(modified) = metadata.modified() {
-                let date: DateTime<Utc> = modified.into();
-                format!("{}", date.format("%a %b %e %Y, %H:%M"))
-            } else {
-                String::new()
-            },
+            entry_type,
+            size,
+            modified,
         };
 
         data.push(file_entry);
@@ -114,4 +123,8 @@ fn print_table(path: &Path) {
     table.modify(Rows::first(), Color::FG_BRIGHT_GREEN);
 
     println!("{}", table);
+}
+
+fn print_error(message: &str) {
+    println!("{}", message.bright_red());
 }
