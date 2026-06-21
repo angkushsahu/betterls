@@ -103,6 +103,8 @@ target (D)
 
 ## 🚀 Installation
 
+> **Note:** Make sure that rust is installed in your system, you can install rust from their [official website](https://rust-lang.org/tools/install/).
+
 ### Build from source
 
 ```bash
