@@ -22,9 +22,113 @@ trustworthy view of filesystem structure without unnecessary noise.
 The project is also intended as a learning-focused systems exercise, demonstrating
 idiomatic Rust for filesystem traversal, error handling, and CLI tooling.
 
+## ⚙️ CLI Options
+
+| Argument      | Short | Description                                  | Default |
+| ------------- | ----- | -------------------------------------------- | ------- |
+| `path`        | —     | Root directory to display.                   | `./`    |
+| `--max-depth` | `-l`  | Limit tree traversal to the specified depth. | `1`     |
+
+### Examples
+
+```bash
+# Current directory (default depth = 1)
+bls
+
+# Scan a specific directory
+bls ./src
+
+# Show up to 3 levels
+bls -l 3
+
+# Show up to 5 levels for a specific path
+bls ~/Documents -l 5
+```
+
+```bash
+$ bls
+
+./ (D)
+├── .gitignore (F, 8 B)
+├── Cargo.lock (F, 4.79 KB)
+├── Cargo.toml (F, 293 B)
+├── README.md (F, 2.76 KB)
+├── output.txt (F, 1.08 KB)
+├── .git (D)
+├── src (D)
+└── target (D)
+
+
+$ bls ./src
+
+src (D)
+├── entity.rs (F, 348 B)
+├── main.rs (F, 1.56 KB)
+├── printer.rs (F, 4.83 KB)
+└── readable_size.rs (F, 526 B)
+
+$ bls ./target -l 2
+
+target (D)
+├── .rustc_info.json (F, 1.69 KB)
+├── CACHEDIR.TAG (F, 177 B)
+├── debug (D)
+│   ├── .cargo-lock (F, 0 B)
+│   ├── betterls (F, 4.14 MB)
+│   ├── betterls.d (F, 99 B)
+│   ├── bls (F, 13.32 MB)
+│   ├── bls.d (F, 240 B)
+│   ├── .fingerprint (D)
+│   ├── build (D)
+│   ├── deps (D)
+│   ├── examples (D)
+│   └── incremental (D)
+├── flycheck0 (D)
+│   ├── stderr (F, 72 B)
+│   └── stdout (F, 15.76 KB)
+└── release (D)
+    ├── .cargo-lock (F, 0 B)
+    ├── bls (F, 727.12 KB)
+    ├── bls.d (F, 242 B)
+    ├── .fingerprint (D)
+    ├── build (D)
+    ├── deps (D)
+    ├── examples (D)
+    └── incremental (D)
+```
+
 ## 👨🏻‍💻 Tech Stack
 
 ![My Skills](https://skillicons.dev/icons?i=rust&theme=dark)
+
+## 🚀 Installation
+
+### Build from source
+
+```bash
+git clone https://github.com/angkushsahu/betterls.git
+cd betterls
+cargo build --release
+```
+
+The compiled binary will be available at:
+
+```text
+target/release/bls
+```
+
+### Install system-wide (Linux)
+
+```bash
+sudo cp target/release/bls /usr/local/bin/
+sudo chmod +x /usr/local/bin/bls
+```
+
+Verify the installation:
+
+```bash
+bls --help
+```
 
 ## 🔗 Links
 
