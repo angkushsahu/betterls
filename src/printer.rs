@@ -1,4 +1,4 @@
-use crate::{entity::Entity, readable_size::read_size};
+use crate::{entity::Entity, log::error_log, readable_size::read_size};
 use std::{
     fs::{self, DirEntry, Metadata},
     io::Result,
@@ -151,7 +151,8 @@ impl Printer {
             self.stack.pop();
 
             if let Err(error) = result {
-                eprintln!("Failed to access {}: {}", entry_path.display(), error);
+                let message = format!("Failed to access {}: {}", entry_path.display(), error);
+                error_log(&message);
             }
         }
 

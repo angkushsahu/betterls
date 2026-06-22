@@ -1,8 +1,9 @@
 mod entity;
+mod log;
 mod printer;
 mod readable_size;
 
-use crate::printer::Printer;
+use crate::{log::error_log, printer::Printer};
 use clap::Parser;
 use std::{fs, path::PathBuf};
 
@@ -47,12 +48,12 @@ fn main() {
 
                 match printer.check_entity(&cli.path) {
                     Ok(_) => (),
-                    Err(e) => eprintln!("{}", e),
+                    Err(e) => error_log(&e.to_string()),
                 }
             } else {
-                eprintln!("Path does not exist");
+                error_log("Path does not exist");
             }
         }
-        Err(e) => eprintln!("{}", e),
+        Err(e) => error_log(&e.to_string()),
     }
 }
