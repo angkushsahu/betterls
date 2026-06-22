@@ -8,6 +8,7 @@ use std::{
 pub(crate) struct Printer {
     stack: Vec<bool>,
     max_depth: usize,
+    secondary_color: String,
 }
 
 impl Printer {
@@ -15,6 +16,7 @@ impl Printer {
         Self {
             stack: Vec::new(),
             max_depth,
+            secondary_color: String::from("\x1b[90m"),
         }
     }
 
@@ -31,16 +33,16 @@ impl Printer {
     fn print_prefix(&self, is_last: bool) {
         for &has_siblings in self.stack.iter() {
             if has_siblings {
-                print!("│   ");
+                print!("{}│   \x1b[0m", self.secondary_color);
             } else {
-                print!("    ");
+                print!("{}    \x1b[0m", self.secondary_color);
             }
         }
 
         if is_last {
-            print!("└── ");
+            print!("{}└── \x1b[0m", self.secondary_color);
         } else {
-            print!("├── ");
+            print!("{}├── \x1b[0m", self.secondary_color);
         }
     }
 
@@ -62,12 +64,20 @@ impl Printer {
         let size = read_size(metadata.len() as usize);
         let file_name = Self::get_file_name(path);
 
-        println!("{} \x1b[90m({}, {})\x1b[0m", file_name, entity_type, size);
+        println!(
+            "{} {}({}, {})\x1b[0m",
+            file_name, self.secondary_color, entity_type, size
+        );
     }
 
     pub(crate) fn directory(&mut self, path: &PathBuf) -> Result<()> {
         let file_name = Self::get_file_name(path);
-        println!("{} \x1b[90m({})\x1b[0m", file_name, Entity::Directory);
+        println!(
+            "{} {}({})\x1b[0m",
+            file_name,
+            self.secondary_color,
+            Entity::Directory
+        );
 
         if self.stack.len() >= self.max_depth {
             return Ok(());
@@ -143,7 +153,7 @@ impl Printer {
     // file first rule and therefore, no sorting is done here
     // pub(crate) fn directory(&mut self, path: &PathBuf) -> Result<()> {
     //     let file_name = Self::get_file_name(path);
-    //     println!("{} \x1b[90m({})\x1b[0m", file_name, Entity::Directory);
+    //     println!("{} {}({})\x1b[0m", file_name, self.secondary_color, Entity::Directory);
 
     //     if self.stack.len() >= self.max_depth {
     //         return Ok(());
