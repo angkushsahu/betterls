@@ -27,6 +27,14 @@ struct Cli {
         default_value_t = 1
     )]
     max_depth: usize,
+
+    #[arg(
+        short = 'a',
+        long = "all",
+        help = "Show all files and directories, including hidden ones",
+        default_value_t = false
+    )]
+    show_hidden: bool,
 }
 
 fn main() {
@@ -35,7 +43,7 @@ fn main() {
     match fs::exists(&cli.path) {
         Ok(does_exist) => {
             if does_exist {
-                let mut printer = Printer::new(cli.max_depth);
+                let mut printer = Printer::new(cli.max_depth, cli.show_hidden);
 
                 match printer.check_entity(&cli.path) {
                     Ok(_) => (),

@@ -1,6 +1,6 @@
 use crate::{entity::Entity, readable_size::read_size};
 use std::{
-    fs::{self, Metadata},
+    fs::{self, DirEntry, Metadata},
     io::Result,
     path::PathBuf,
 };
@@ -9,14 +9,16 @@ pub(crate) struct Printer {
     stack: Vec<bool>,
     max_depth: usize,
     secondary_color: String,
+    show_hidden: bool,
 }
 
 impl Printer {
-    pub(crate) fn new(max_depth: usize) -> Self {
+    pub(crate) fn new(max_depth: usize, show_hidden: bool) -> Self {
         Self {
             stack: Vec::new(),
             max_depth,
             secondary_color: String::from("\x1b[90m"),
+            show_hidden,
         }
     }
 
@@ -88,6 +90,13 @@ impl Printer {
         let mut directories = Vec::new();
 
         for entry in fs::read_dir(path)?.flatten() {
+            // check if files are hidden or not, if they are, and the flag for hidden files are
+            // unset, then don't process them
+
+            if !self.show_hidden && self.is_hidden(&entry) {
+                continue;
+            }
+
             let file_type = entry.file_type()?;
 
             if file_type.is_file() {
@@ -149,9 +158,27 @@ impl Printer {
         Ok(())
     }
 
+    fn is_hidden(&self, entry: &DirEntry) -> bool {
+        #[cfg(target_os = "windows")]
+        {
+            use std::os::windows::fs::MetadataExt;
+            const FILE_ATTRIBUTE_HIDDEN: u32 = 0x2;
+
+            entry
+                .metadata
+                .map(|m| m.file_attributes() & FILE_ATTRIBUTE_HIDDEN != 0)
+                .unwrap_or(false)
+        }
+
+        #[cfg(not(target_os = "windows"))]
+        {
+            entry.file_name().to_string_lossy().starts_with('.')
+        }
+    }
+
     // NOTE: dO NOT REMOVE this code block, this is much more performant as it does not follow the
     // file first rule and therefore, no sorting is done here
-    // pub(crate) fn directory(&mut self, path: &PathBuf) -> Result<()> {
+    // fn directory(&mut self, path: &PathBuf) -> Result<()> {
     //     let file_name = Self::get_file_name(path);
     //     println!("{} {}({})\x1b[0m", file_name, self.secondary_color, Entity::Directory);
 
