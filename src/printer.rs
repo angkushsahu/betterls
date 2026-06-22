@@ -62,7 +62,7 @@ impl Printer {
         Ok(())
     }
 
-    pub(crate) fn file_and_symlink(&self, path: &PathBuf, metadata: Metadata, entity_type: Entity) {
+    fn file_and_symlink(&self, path: &PathBuf, metadata: Metadata, entity_type: Entity) {
         let size = read_size(metadata.len() as usize);
         let file_name = Self::get_file_name(path);
 
@@ -72,7 +72,7 @@ impl Printer {
         );
     }
 
-    pub(crate) fn directory(&mut self, path: &PathBuf) -> Result<()> {
+    fn directory(&mut self, path: &PathBuf) -> Result<()> {
         let file_name = Self::get_file_name(path);
         println!(
             "{} {}({})\x1b[0m",
