@@ -44,6 +44,7 @@ fn main() {
     match fs::exists(&cli.path) {
         Ok(does_exist) => {
             if does_exist {
+                // Initializing the printer struct with user provided or default values
                 let mut printer = Printer::new(cli.max_depth, cli.show_hidden);
 
                 match printer.check_entity(&cli.path) {

@@ -22,6 +22,7 @@ impl Printer {
         }
     }
 
+    /// Print './' if '.' or './' path is provided
     fn get_file_name(path: &PathBuf) -> &str {
         if path == "./" || path == "." {
             return "./";
@@ -32,6 +33,7 @@ impl Printer {
             .unwrap_or("<Invalid UTF-8>")
     }
 
+    /// Prints the symbols dictating hierarchy
     fn print_prefix(&self, is_last: bool) {
         for &has_siblings in self.stack.iter() {
             if has_siblings {
