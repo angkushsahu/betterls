@@ -1,5 +1,6 @@
 use crate::{entity::Entity, log::error_log, readable_size::read_size};
 use std::{
+    collections::HashSet,
     fs::{self, DirEntry, Metadata},
     io::Result,
     path::PathBuf,
@@ -10,16 +11,30 @@ pub(crate) struct Printer {
     max_depth: usize,
     secondary_color: String,
     show_hidden: bool,
+    ignore: HashSet<String>,
 }
 
 impl Printer {
-    pub(crate) fn new(max_depth: usize, show_hidden: bool) -> Self {
+    pub(crate) fn new(max_depth: usize, show_hidden: bool, ignore: Vec<String>) -> Self {
         Self {
             stack: Vec::new(),
             max_depth,
             secondary_color: String::from("\x1b[90m"),
             show_hidden,
+            ignore: ignore.into_iter().filter(|name| !name.is_empty()).collect(),
         }
+    }
+
+    /// Returns true if entry's name is present in the user provided ignore list.
+    /// If the ignore list is empty (default), nothing is ever ignored, if a name
+    /// in the list doesn't match anything present, it is silently skipped without error.
+    fn is_ignored(&self, entry: &DirEntry) -> bool {
+        if self.ignore.is_empty() {
+            return false;
+        }
+
+        self.ignore
+            .contains(entry.file_name().to_string_lossy().as_ref())
     }
 
     /// Print './' if '.' or './' path is provided
@@ -95,7 +110,13 @@ impl Printer {
             // check if files are hidden or not, if they are, and the flag for hidden files are
             // unset, then don't process them
 
+            // continue to next iteration if user doesn't want to see hidden directories / files
             if !self.show_hidden && self.is_hidden(&entry) {
+                continue;
+            }
+
+            // continue to next iteration if current entity is ignored
+            if self.is_ignored(&entry) {
                 continue;
             }
 

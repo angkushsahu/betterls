@@ -36,6 +36,15 @@ struct Cli {
         default_value_t = false
     )]
     show_hidden: bool,
+
+    #[arg(
+        short = 'i',
+        long = "ignore",
+        value_name = "NAMES",
+        help = "Comma-separated list of file or directory names to ignore (e.g., target,node_modules,build)",
+        value_delimiter = ','
+    )]
+    ignore: Vec<String>,
 }
 
 fn main() {
@@ -44,8 +53,15 @@ fn main() {
     match fs::exists(&cli.path) {
         Ok(does_exist) => {
             if does_exist {
+                // Trim whitespace in case the user added spaces around commas
+                let ignore: Vec<String> = cli
+                    .ignore
+                    .iter()
+                    .map(|name| name.trim().to_string())
+                    .collect();
+
                 // Initializing the printer struct with user provided or default values
-                let mut printer = Printer::new(cli.max_depth, cli.show_hidden);
+                let mut printer = Printer::new(cli.max_depth, cli.show_hidden, ignore);
 
                 match printer.check_entity(&cli.path) {
                     Ok(_) => (),
