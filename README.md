@@ -47,6 +47,12 @@ bls -l 3
 
 # Show up to 5 levels for a specific path
 bls ~/Documents -l 5
+
+# Show all files in the current directory (including the hidden files)
+bls -a
+
+# Show "javascript-project" directory contents upto 2 level except the node-modules directory
+bls javascript-project -l 2 -i node_modules
 ```
 
 ```bash
