@@ -11,6 +11,8 @@
 - Tree view with configurable depth
 - Files listed before directories for improved visibility
 - Symlinks are never followed
+- Option to show all files and directories, including hidden ones
+- Option to ignore specific files or directories by name
 - Minimal, opinionated feature set focused on core filesystem inspection
 
 ### Design philosophy
@@ -24,10 +26,12 @@ idiomatic Rust for filesystem traversal, error handling, and CLI tooling.
 
 ## ⚙️ CLI Options
 
-| Argument      | Short | Description                                  | Default |
-| ------------- | ----- | -------------------------------------------- | ------- |
-| `path`        | —     | Root directory to display.                   | `./`    |
-| `--max-depth` | `-l`  | Limit tree traversal to the specified depth. | `1`     |
+| Argument      | Short | Description                                                                                     | Default |
+| ------------- | ----- | ----------------------------------------------------------------------------------------------- | ------- |
+| `path`        |   -  | Root directory to display.                                                                       |   `./`  |
+| `--max-depth` | `-l` | Limit tree traversal to the specified depth.                                                     |   `1`   |
+| `--all`       | `-a` | Show all files and directories, including hidden ones.                                           |    -    |
+| --ignore      | `-i` | Comma separated list of file and directory names to ignore (example, node_modules,target,build). |    -    |
 
 ### Examples
 
@@ -95,6 +99,26 @@ target (D)
     ├── deps (D)
     ├── examples (D)
     └── incremental (D)
+
+$ bls ./target -l 2 -i flycheck0,release
+# The above command is equivalent to
+$ ./target -l 2 -i "flycheck0, release"
+
+target (D)
+├── CACHEDIR.TAG (F, 177 B)
+└── debug (D)
+    ├── editoria (F, 8.81 MB)
+    ├── editoria.d (F, 1.86 KB)
+    ├── build (D)
+    ├── deps (D)
+    ├── examples (D)
+    └── incremental (D)
+
+$ bls -a
+
+./ (D)
+├── .hidden.txt (F, 0 B)
+└── not-hidden.txt (F, 0 B)
 ```
 
 ## 👨🏻‍💻 Tech Stack
