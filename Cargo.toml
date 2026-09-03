@@ -17,4 +17,4 @@ incremental = true
 codegen-units = 1
 lto = "fat"
 opt-level = 3
-strip = "debuginfo"
+strip = "symbols"
