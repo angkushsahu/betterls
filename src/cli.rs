@@ -8,11 +8,8 @@ use std::path::PathBuf;
     long_about = "A fast, lightweight command-line utility written in Rust for displaying directory structures as a tree. The tool recursively traverses directories, clearly differentiates files, symbolic links, and folders, supports configurable depth limits, handles filesystem errors gracefully, and presents output in a clean, readable format with subtle terminal styling. Designed with performance, reliability, and cross-platform compatibility in mind."
 )]
 pub struct Cli {
-    #[arg(
-        help = "Root directory to display. Defaults to the current directory if omitted.",
-        default_value = "./"
-    )]
-    pub path: PathBuf,
+    #[arg(help = "Root directories to display. Defaults to the current directory if omitted.")]
+    pub paths: Vec<PathBuf>,
 
     #[arg(
         long = "max-depth",
