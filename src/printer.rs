@@ -3,13 +3,13 @@ use std::{
     collections::HashSet,
     fs::{self, DirEntry, Metadata},
     io::Result,
-    path::PathBuf,
+    path::Path,
 };
 
 pub(crate) struct Printer {
     stack: Vec<bool>,
     max_depth: usize,
-    secondary_color: String,
+    secondary_color: &'static str,
     show_hidden: bool,
     ignore: HashSet<String>,
 }
@@ -19,7 +19,7 @@ impl Printer {
         Self {
             stack: Vec::new(),
             max_depth,
-            secondary_color: String::from("\x1b[90m"),
+            secondary_color: "\x1b[90m",
             show_hidden,
             ignore: ignore.into_iter().filter(|name| !name.is_empty()).collect(),
         }
@@ -38,7 +38,7 @@ impl Printer {
     }
 
     /// Print './' if '.' or './' path is provided
-    fn get_file_name(path: &PathBuf) -> &str {
+    fn get_file_name(path: &Path) -> &str {
         if path == "./" || path == "." {
             return "./";
         }
@@ -65,7 +65,7 @@ impl Printer {
         }
     }
 
-    pub(crate) fn check_entity(&mut self, path: &PathBuf) -> Result<()> {
+    pub(crate) fn check_entity(&mut self, path: &Path) -> Result<()> {
         let metadata = fs::symlink_metadata(path)?;
 
         if metadata.is_symlink() {
@@ -79,7 +79,7 @@ impl Printer {
         Ok(())
     }
 
-    fn file_and_symlink(&self, path: &PathBuf, metadata: Metadata, entity_type: Entity) {
+    fn file_and_symlink(&self, path: &Path, metadata: Metadata, entity_type: Entity) {
         let size = read_size(metadata.len() as usize);
         let file_name = Self::get_file_name(path);
 
@@ -89,7 +89,7 @@ impl Printer {
         );
     }
 
-    fn directory(&mut self, path: &PathBuf) -> Result<()> {
+    fn directory(&mut self, path: &Path) -> Result<()> {
         let file_name = Self::get_file_name(path);
         println!(
             "{} {}({})\x1b[0m",
@@ -202,7 +202,7 @@ impl Printer {
 
     // NOTE: dO NOT REMOVE this code block, this is much more performant as it does not follow the
     // file first rule and therefore, no sorting is done here
-    // fn directory(&mut self, path: &PathBuf) -> Result<()> {
+    // fn directory(&mut self, path: &Path) -> Result<()> {
     //     let file_name = Self::get_file_name(path);
     //     println!("{} {}({})\x1b[0m", file_name, self.secondary_color, Entity::Directory);
 
