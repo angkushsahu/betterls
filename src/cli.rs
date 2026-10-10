@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, ValueHint};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -33,7 +33,8 @@ pub struct Cli {
         long = "ignore",
         value_name = "NAMES",
         help = "Comma-separated list of file or directory names to ignore (e.g., target,node_modules,build)",
-        value_delimiter = ','
+        value_delimiter = ',',
+        value_hint = ValueHint::AnyPath
     )]
-    pub ignore: Vec<String>,
+    pub ignore: Vec<PathBuf>,
 }

@@ -6,22 +6,22 @@ use std::{
     path::Path,
 };
 
-pub(crate) struct Printer {
+pub(crate) struct Printer<'a> {
     stack: Vec<bool>,
     max_depth: usize,
     secondary_color: &'static str,
     show_hidden: bool,
-    ignore: HashSet<String>,
+    ignore: &'a HashSet<&'a str>,
 }
 
-impl Printer {
-    pub(crate) fn new(max_depth: usize, show_hidden: bool, ignore: Vec<String>) -> Self {
+impl<'a> Printer<'a> {
+    pub(crate) fn new(max_depth: usize, show_hidden: bool, ignore: &'a HashSet<&'a str>) -> Self {
         Self {
             stack: Vec::new(),
             max_depth,
             secondary_color: "\x1b[90m",
             show_hidden,
-            ignore: ignore.into_iter().filter(|name| !name.is_empty()).collect(),
+            ignore,
         }
     }
 
@@ -31,6 +31,23 @@ impl Printer {
     fn is_ignored(&self, entry: &DirEntry) -> bool {
         if self.ignore.is_empty() {
             return false;
+        }
+
+        #[allow(clippy::collapsible_if)]
+        if let Some(name) = entry.file_name().to_str() {
+            if self.ignore.contains(name) {
+                return true;
+            }
+
+            let mut suffixed_name = format!("{}/", name);
+            if self.ignore.contains(suffixed_name.as_str()) {
+                return true;
+            }
+
+            suffixed_name = format!("{}\\", name);
+            if self.ignore.contains(suffixed_name.as_str()) {
+                return true;
+            }
         }
 
         self.ignore

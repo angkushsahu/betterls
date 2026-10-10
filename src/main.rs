@@ -17,19 +17,20 @@ fn main() {
         cli.paths
     };
 
+    // Trim whitespace in case the user added spaces around commas
+    let ignore = cli
+        .ignore
+        .iter()
+        .map(|path| path.to_str().unwrap_or("").trim())
+        .filter(|path_name| !path_name.is_empty())
+        .collect();
+
     for path in paths {
         match fs::exists(&path) {
             Ok(does_exist) => {
                 if does_exist {
-                    // Trim whitespace in case the user added spaces around commas
-                    let ignore: Vec<String> = cli
-                        .ignore
-                        .iter()
-                        .map(|name| name.trim().to_string())
-                        .collect();
-
                     // Initializing the printer struct with user provided or default values
-                    let mut printer = Printer::new(cli.max_depth, cli.show_hidden, ignore);
+                    let mut printer = Printer::new(cli.max_depth, cli.show_hidden, &ignore);
 
                     match printer.check_entity(&path) {
                         Ok(_) => (),
