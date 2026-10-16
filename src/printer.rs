@@ -206,7 +206,7 @@ impl<'a> Printer<'a> {
             const FILE_ATTRIBUTE_HIDDEN: u32 = 0x2;
 
             entry
-                .metadata
+                .metadata()
                 .map(|m| m.file_attributes() & FILE_ATTRIBUTE_HIDDEN != 0)
                 .unwrap_or(false)
         }
