@@ -4,11 +4,17 @@ mod log;
 mod printer;
 mod readable_size;
 
-use crate::{cli::Cli, log::error_log, printer::Printer};
+use crate::{
+    cli::Cli,
+    log::{enable_ansi_support, error_log},
+    printer::Printer,
+};
 use clap::Parser;
 use std::{fs, path::PathBuf};
 
 fn main() {
+    enable_ansi_support(); // For windows ANSI colored support
+
     let cli = Cli::parse();
 
     let paths = if cli.paths.is_empty() {
