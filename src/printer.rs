@@ -1,4 +1,8 @@
-use crate::{entity::Entity, log::error_log, readable_size::read_size};
+use crate::{
+    entity::Entity,
+    log::{error_log, muted_log, print_dir_name, print_file_or_symlink_name},
+    readable_size::read_size,
+};
 use std::{
     collections::HashSet,
     fs::{self, DirEntry, Metadata},
@@ -9,7 +13,7 @@ use std::{
 pub(crate) struct Printer<'a> {
     stack: Vec<bool>,
     max_depth: usize,
-    secondary_color: &'static str,
+    // secondary_color: &'static str,
     show_hidden: bool,
     ignore: &'a HashSet<&'a str>,
 }
@@ -19,7 +23,7 @@ impl<'a> Printer<'a> {
         Self {
             stack: Vec::new(),
             max_depth,
-            secondary_color: "\x1b[90m",
+            // secondary_color: "\x1b[90m",
             show_hidden,
             ignore,
         }
@@ -69,16 +73,20 @@ impl<'a> Printer<'a> {
     fn print_prefix(&self, is_last: bool) {
         for &has_siblings in self.stack.iter() {
             if has_siblings {
-                print!("{}│   \x1b[0m", self.secondary_color);
+                // print!("{}│   \x1b[0m", self.secondary_color);
+                muted_log("│   ");
             } else {
-                print!("{}    \x1b[0m", self.secondary_color);
+                // print!("{}    \x1b[0m", self.secondary_color);
+                muted_log("    ");
             }
         }
 
         if is_last {
-            print!("{}└── \x1b[0m", self.secondary_color);
+            // print!("{}└── \x1b[0m", self.secondary_color);
+            muted_log("└── ");
         } else {
-            print!("{}├── \x1b[0m", self.secondary_color);
+            // print!("{}├── \x1b[0m", self.secondary_color);
+            muted_log("├── ");
         }
     }
 
@@ -100,20 +108,24 @@ impl<'a> Printer<'a> {
         let size = read_size(metadata.len() as usize);
         let file_name = Self::get_file_name(path);
 
-        println!(
-            "{} {}({}, {})\x1b[0m",
-            file_name, self.secondary_color, entity_type, size
-        );
+        // println!(
+        //     "{} {}({}, {})\x1b[0m",
+        //     file_name, self.secondary_color, entity_type, size
+        // );
+        // muted_log(&format!("{} ({}, {})", file_name, entity_type, size));
+        print_file_or_symlink_name(file_name, entity_type, &size);
     }
 
     fn directory(&mut self, path: &Path) -> Result<()> {
         let file_name = Self::get_file_name(path);
-        println!(
-            "{} {}({})\x1b[0m",
-            file_name,
-            self.secondary_color,
-            Entity::Directory
-        );
+        // println!(
+        //     "{} {}({})\x1b[0m",
+        //     file_name,
+        //     self.secondary_color,
+        //     Entity::Directory
+        // );
+        // muted_log(&format!("{} ({})\x1b[0m", file_name, Entity::Directory));
+        print_dir_name(file_name);
 
         if self.stack.len() >= self.max_depth {
             return Ok(());
