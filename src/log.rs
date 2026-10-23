@@ -12,7 +12,10 @@ pub(crate) fn enable_ansi_support() {
 
     unsafe {
         let handle = GetStdHandle(STD_OUTPUT_HANDLE);
-        if handle.is_null() || handle == 0 || handle == -1_isize as *mut std::ffi::c_void {
+        if handle.is_null()
+            || handle == std::ptr::null_mut()
+            || handle == -1_isize as *mut std::ffi::c_void
+        {
             return;
         }
 
